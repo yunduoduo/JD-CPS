@@ -1,0 +1,9 @@
+/* CSS Document */
+body p ul{ margin:0; padding:0;}
+p{ margin:0; padding:0;}
+
+.cgdh_wrap{width:320px;height:680px;border:1px solid #000;}
+.cgdh_head{width:320px; height:228px;margin:0;padding:0;background:url(/res/weixin/images/cgcz.png);position:relative;}
+.cgdh_head_tit , .cgdh_head_stit{text-align:center;font-weight:bold;color:#000;}
+
+

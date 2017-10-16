@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<fieldset style="width: 100%; padding: 5%;">
+	<form class="form-horizontal" role="form" action="/rc/admin/role/save_permission" method="post" onsubmit="return toSubmit()">
+		<input type="hidden" name="roleId" value="${roleId}"/>
+		<div class="row">
+			<div class="col-md-11" style="height:auto;width:100%; ">
+				<#list permissions as p>
+						<label><input name="permissionId" type="checkbox" value="${p.permissionId }" ${p.has ? string('checked', '') }> ${p.permissionName }</label>
+				</#list>
+			</div>
+		  	<div class="col-md-4">
+		  	<br>
+				<button type="submit" class="btn btn-primary">更新</button>		  	
+		  	</div>
+		</div>
+	</form>
+</fieldset>

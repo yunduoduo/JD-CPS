@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<#include "include/_layout.html" />
+<@layout page_title="管理后台">
+
+<div class="container" style="margin-right: inherit; margin-left: inherit;">
+<fieldset>
+	<legend>系统设置</legend>
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+				<th>名称</th>
+				<th>值</th>
+				<th>描述</th>
+				<th>更新日期</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<#list configs as config>
+			<c:forEach items="${configs }" var="config">
+				<form action="/admin/manager/config_modify" method="post">
+				<input type="hidden" name="key" value="${config.configKey }"/>
+				<tr>
+					<td>${config.configName }</td>
+					<td>
+						<div class="row">
+						<div class="col-xs-12">
+						<c:if test="${config.showType eq 1 }">
+							<input class="form-control" type="text" name="val" value="${config.configValue }"/>
+						</c:if>
+						<c:if test="${config.showType eq 2 }">
+							<textarea class="form-control" rows="4" name="val">${config.configValue }</textarea>
+						</c:if>
+						</div>
+						</div>
+					</td>
+					<td>${config.configDesc }</td>
+					<td>${config.modifyDate }</td>
+					<td>
+						<button type="submit" class="btn btn-primary updateConfig">更新</button>
+					</td>
+				</tr>
+				</form>
+			</c:forEach>
+			</#list>
+		</tbody>
+	</table>
+</fieldset>
+</div>
+
+</@layout>

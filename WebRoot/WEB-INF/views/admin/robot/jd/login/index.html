@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<#include "../../../include/_layout.html" />
+<@layout page_title="管理后台"> 
+<script type="text/javascript" src="/res/jd/js/td.js"></script>
+<script type="text/javascript">
+var imgsrc = "${src!}";
+$(function () {
+    getJdEid(function (eid, fpid) {
+        var eValue = eid;
+        var fpValue = fpid;
+        var ee = $("#eid").prop("value", eValue);
+        var fp = $("#sessionId").prop("value", fpValue);
+    });
+});
+var cookie = "${cookie!}";
+var loginName = "${loginname!}";
+if(loginName != ''){
+	 showAuthCode(loginName,cookie); 
+}
+
+function loginCli(){
+	var loginN = $('#loginname').val();
+	showAuthCode(loginN,cookie);
+}
+function UpAuthcode(){
+	var imgsrc = $('#JD_Verification1').attr("src2");
+	var code_Img = $("#code_Img").val();
+	 $.ajax({
+         type: "POST",
+         dataType: "json",
+         url: "/robotAdmin/rob/jd/login/upAuthcode",
+         data: {imgsrc:imgsrc,code_Img:code_Img},
+         success: function (msg) {
+            if(msg.code=="0"){
+            	$("#JD_Verification1").attr("src",msg.info);
+            	$("#code_Img").val(msg.info);
+            }else{
+            	layer.alert(msg.info,3);
+            }
+         },
+         error: function(data) {
+        	 layer.alert(msg.info,3);
+          }
+     });
+}
+function showAuthCode(loginName,cookie){
+	 $.ajax({
+         type: "POST",
+         dataType: "json",
+         url: "/robotAdmin/rob/jd/login/showAuthCode",
+         data: {"loginName":loginName,"cookie":cookie,imgsrc:imgsrc},
+         success: function (msg) {
+            if(msg.code=="0"){
+            	var res = msg.info;
+            	if(res.indexOf("true") > 0){
+            		$('#showAuthCode').css("display","block");
+            		$("#code_Img").val(msg.codeImg);
+            		$("#JD_Verification1").attr("src",msg.codeImg);
+            	}else{
+            		$('#showAuthCode').css("display","none");
+            	}
+            }else{
+            	layer.alert(msg.info,3);
+            }
+         },
+         error: function(data) {
+        	 layer.alert(msg.info,3);
+          }
+     });
+}
+</script>
+<div class="container-fluid">
+<fieldset>
+	<legend>京东联盟登录</legend>
+	<form class="form-horizontal" id="fromData" role="form"  method="post" >
+	<input type="hidden" class="form-control" id="tsubstring" name="tsubstring"   value="">
+	<input type="hidden" name="eid" id="eid" value="" class="hide">
+    <input type="hidden" name="fp" id="sessionId" value="" class="hide">
+    <input type="hidden" name="seqSid" id="seqSid" value="" class="hide">
+    <input type="hidden" name="code_Img" id="code_Img" value="" class="hide">
+	  	<div class="form-group">
+			<label class="col-sm-2 control-label" for="loginname">帐号&nbsp;<span class="text-danger">*</span></label>
+			<div class="col-sm-8">
+		    	<input type="text" class="form-control" id="loginname" name="loginname" placeholder="账户名" maxlength="30" required="required" value="${loginname!}" onchange="loginCli()">
+		    </div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" for="password">密码&nbsp;<span class="text-danger">*</span></label>
+			<div class="col-sm-8">
+		    	<input type="password" class="form-control" id="password" name="password" placeholder="密码" maxlength="30" required="required" value="${password!}" >
+		    </div>
+		</div>
+		 <div class="form-group" id="showAuthCode" style="display: none;" >
+			<label class="col-sm-2 control-label" for="authcode">验证码&nbsp;<span class="text-danger">*</span></label>
+			<div class="col-sm-2">
+		    	<input type="text"  class="form-control" id="authcode" name="authcode" placeholder="验证码" maxlength="6" required="required" value="">
+			    <!-- <input id="authcode" type="text" class="form-control" name="authcode" tabindex="3" maxlength="6"> --> 
+		    </div>
+		    <div class="col-sm-6">
+		     <img id="JD_Verification1" class="verify-code" src2="${src!}"  onclick="UpAuthcode()">
+			<!-- 	${imgString} -->
+				<a href="javascript:void(0)" onclick="$('#JD_Verification1').click();">看不清换一张</a>
+		    </div>
+		</div>
+	</form>
+	<div class="form-group">
+    	<div class="col-sm-offset-2 col-sm-8">
+      		<button type="button"  class="btn btn-default butsub" >登录</button>
+    	</div>
+  	</div>
+</fieldset>
+<script type="text/javascript">
+$(function(){
+	$('.butsub').click(function(){
+		var st = $('#showAuthCode').attr("style");
+		if(st.indexOf("block") > 0){
+			if($('#authcode').val() == ''){
+				layer.alert("请填写验证码...",3);
+				return false;
+			}
+		}
+	
+		  rc.loading("正在登录...");
+		  $.ajax({
+              type: "POST",
+              dataType: "json",
+              url: "/robotAdmin/rob/jd/login/jdLogin",
+              data: $('#fromData').serialize(),
+              success: function (msg) {
+            	 layer.closeAll();
+                 if(msg.code=="0"){
+                	 layer.alert(msg.info,9,function(){
+	                	 window.location.href="/robotAdmin/rob/jd/order/findImpOrder";
+                	 });
+                 }else{
+                	 layer.alert(msg.info,3,function(){
+	                	 window.location.reload();
+                	 });
+                 }
+              },
+              error: function(data) {
+            	  layer.alert(msg.info,3);
+               }
+          });
+	});
+});
+
+</script>
+<script type="text/javascript" src="https://seq.jd.com/jseqf.html?bizId=passport_jd_com_login_pc&platform=js&version=1"></script>
+<script type="text/javascript">
+$(function(){
+	var seqSid = window._jdtdmap_sessionId;
+	$("#seqSid").prop("value", seqSid);
+});
+</script>
+</div>
+</@layout>

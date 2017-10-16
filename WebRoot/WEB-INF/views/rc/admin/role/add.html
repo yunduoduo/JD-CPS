@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<#include "../include/_layout.html" />
+<@layout page_title="管理后台">
+
+<div class="container" style="margin-right: inherit; margin-left: inherit;">
+<fieldset>
+	<legend><#if (role.roleId)??>更新<#else>添加</#if>角色</legend>
+	<form class="form-horizontal" role="form" action="/rc/admin/role/save" method="post" onsubmit="return toSubmit()">
+		<input type="hidden" name="role.roleId" value="${(role.roleId)! }"/>
+		<div class="form-group">
+		    <label class="col-sm-2 control-label" for="account">名称</label>
+		    <div class="col-sm-10">
+		    <input type="text" class="form-control" id="roleName" required="required" name="role.roleName" placeholder="名称" value="${(role.roleName)! }">
+		    </div>
+	  	</div>
+	  	<div class="form-group">
+	  	<label class="col-sm-2 control-label" for=""></label>
+	  	<div class="col-sm-10">
+	  	<button type="submit" class="btn btn-primary"><#if (role.roleId)??>更新<#else>添加</#if></button>
+	  	</div>
+	  	</div>
+	</form>
+</fieldset>
+</div>
+
+</@layout>
+

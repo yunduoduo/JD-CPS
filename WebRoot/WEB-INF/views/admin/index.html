@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<#include "include/_layout.html" />
+<@layout page_title="白领科技">
+<script type="text/javascript">
+var adminMsg;
+var sub_menus = {
+	realEstate:[{
+		header: "登录",
+		links: [{
+			name: "微信登录",
+			url: "/robotAdmin/rob/collect"
+		},{
+			name: "京东联盟登录",
+			url: "/robotAdmin/rob/jd/login"
+		}]
+	},{
+		header: "微信采集",
+		links: [{
+			name: "采集群列表",
+			url: "/robotAdmin/rob/user/wxUserList"
+		},{
+			name: "采集商品列表",
+			url: "/robotAdmin/rob/gather/gatherList"
+		} ,{
+			name: "待发商品列表",
+			url: "/robotAdmin/rob/gather/linksList"
+		}]
+	},{
+		header: "微信群发",
+		links: [{
+			name: "群发时间设置",
+			url: "/robotAdmin/rob/userConfig/setSendTimes"
+		}]
+	}],
+	
+	personJD:[{
+		header: "订单查询",
+		links: [{
+			name: "引入订单",
+			url: "/robotAdmin/rob/jd/order/findImpOrder"
+		},{
+			name: "业绩订单",
+			url: "/robotAdmin/rob/jd/order/performanceOrder"
+		}]
+	}],
+
+	 logRecord:[{
+		header: "商品记录",
+		links: [{
+			name: "微信群发记录",
+			url: "/robotAdmin/rob/gather/findGroupRecord"
+		},{
+			name: "商品推送记录",
+			url: "/robotAdmin/rob/record/sendRecord"
+		},{
+			name: "客户端日志",
+			url: "/robotAdmin/rob/record/userLogRecord"
+		}]
+	}],
+	system: [{
+		header: "管理员",
+		links: [
+		{
+			name: "添加管理员",
+			url: "/rc/admin/add"
+		}, {
+			name: "管理员列表",
+			url: "/rc/admin/list"
+		},
+		{
+			name: "管理员角色",
+			url: "/rc/admin/role/list"
+		},
+		{
+			name: "权限配置",
+			url: "/rc/admin/permission/list"
+		},
+		{
+			name: "修改密码",
+			url: "/rc/admin/repwd"
+		}]
+	}]
+};
+
+var adminLog = {
+		header: "后台操作日志",
+		links: [{
+			name: "操作日志",
+			url: "/robotAdmin/rob/adminLog/findLogs"
+		}]
+	}
+var bo = ${isRoot?string('true','false')};
+if(bo){
+	sub_menus.logRecord.push(adminLog);
+}
+$(function() {
+	//switchSubMenu("realEstate");//选择谁，谁先被选中
+	switchSubMenu($('#admin_top_menu li:first-child a').attr("url"));
+	$("#admin_top_menu li").click(function() {
+		$(this).addClass("active").siblings().removeClass("active");
+	});
+	$(document).on("click", ".main-menu", function() {
+		var url = $(this).attr("url");
+		switchSubMenu(url);
+	}).on("click", ".list-group-item", function() {
+		$(this).addClass("active").siblings().removeClass("active");
+		var url = $(this).attr("url");
+		$("#main-content${random}").attr("src", url);
+	});
+	function switchSubMenu(url) {
+		$.each(sub_menus, function(key, value) {
+			if (key == url) {
+				var lis = '';
+				$.each(value, function(i, n) {
+					var header = n.header;
+					lis += '<div class="panel-heading">' + header + '</div>';
+					var links = n.links;
+					$.each(links, function(i, n) {
+						lis += '<a href="javascript:;" url="' + n.url + (n.url.indexOf("?") > -1 ? "&" : "?") + "t=" + new Date().getTime() + '" class="list-group-item">' + n.name + '</a>';
+					});
+				});
+				$("#sub-menu").html(lis);
+				return false;
+			}
+		});
+	}
+	
+	if (BrowserDetect.browser == "Explorer" && 7 >= BrowserDetect.version) {
+		$("#iframe-container").css("width", "81%");
+	}
+});
+$(function() {
+	$('#admin_top_menu li:first-child a').addClass("active");
+	fixIFrameHeight();
+	$(window).resize(function() {
+		fixIFrameHeight();
+	});
+	function fixIFrameHeight() {
+		var h = $(window).height() ;
+		//alert(h);
+		$("#iframe-container").height(h);
+	}
+	
+	var b_name = BrowserDetect.browser;
+	var version = BrowserDetect.version;
+	if (b_name != "Chrome" && b_name != "Firefox" && b_name != "Explorer" && b_name != "Safari" && b_name != "Mozilla") {
+		alert("该浏览器(" + b_name + version + ")，不完全或根本不支持html5特性，使用本系统时，可能会出现一些问题，建议使用chrome,firefiox,ie等最新版本，他们也更加高效");
+		//location.href = "/updateBrowser";
+		return;
+	}
+	if (b_name == "Explorer" && version <= 9) {
+		alert("该浏览器(" + b_name + version + ")，不完全或根本不支持html5特性，使用本系统时，可能会出现一些问题，建议使用chrome,firefiox,ie等最新版本，他们也更加高效");
+		//location.href = "/updateBrowser";
+		return;
+	}
+});
+</script>
+    <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/robotAdmin/index"><b>白领科技</b></a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <p class="navbar-text pull-right" style="margin-right: 10px;">
+		  	当前登录账户：${__admin.account }&nbsp;<a href="/rc/admin/loguot"><i class="icon-off icon-white"></i>退出</a>
+		  </p>
+          <ul class="nav navbar-nav" id="admin_top_menu">
+	          <#list roleList as roles>
+	          		<li><a class="main-menu" url="${roles.value!}" href="javascript:;">${roles.name!}</a></li>
+	          </#list>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="" style="padding: 0 10px 0 10px; padding-top: 63px;">
+      <div class="row row-offcanvas row-offcanvas-right">
+        <div class="col-xs-2 col-sm-2 col-lg-2 col-md-2 sidebar-offcanvas" id="sidebar" role="navigation">
+        	<div class="panel panel-info" id="sub-menu"></div>
+        </div><!--/span-->
+        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" id="iframe-container">
+	        <iframe name="main-content${random}" id="main-content${random}" src="" style="width: 100%; height: 100%; border: none;" frameBorder="0"></iframe>
+        </div>
+      </div>
+      <hr style="margin-top: 0; margin-bottom: 5px; border: 1px #666 solid;">
+      <footer>
+        <p>&copy; Company 2017</p>
+      </footer>
+    </div>
+     <!--  <li class="active">  active 样式就是谁先被选中  <a class="main-menu" url="member" href="javascript:;">会员管理</a></li> -->
+            <!-- <li><a class="main-menu" url="weixin" href="javascript:;">微信推送</a></li> -->
+           <!--  <li><a class="main-menu" url="redeemCode" href="javascript:;">渠道</a></li> -->
+            <#--   <li class="active"><a class="main-menu" url="realEstate" href="javascript:;">微信</a></li>
+            <li><a class="main-menu" url="personJD" href="javascript:;">订单</a></li>
+           <#if isRoot>
+             	<li><a class="main-menu" url="system" href="javascript:;">后台管理</a></li>
+           </#if> -->
+          
+</@layout>

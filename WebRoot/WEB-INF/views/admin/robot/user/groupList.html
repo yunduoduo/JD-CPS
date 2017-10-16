@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<#include "../../include/_layout.html" />
+<@layout page_title="管理后台">
+	<fieldset>
+		<legend>用户群信息</legend>
+		<div style="margin-bottom: 7px;">
+			<button type="button" class="btn btn-success " id="gather">采 集</button>
+			<span style="color: red;">注意：采集商品的顺序是先发文字再发图。</span>
+		</div>
+		<table class="table table-bordered table-hover table-condensed" id="lists">
+			<thead>
+				<tr>
+					<th style="text-align: center;width: 100px;">主键</th>
+					<th style="width: 120px;text-align: center;"><input id="CheckAll"  type="checkbox" />&nbsp;设置采集群</th>
+					<th style="text-align: center;">群名称</th>
+					<th style="text-align: center;">群来自于</th>
+				</tr>
+			</thead>
+			<tbody style="text-align: center;" class="chedb">
+				<#list page.list as gr>
+					<tr>
+						<td>${gr.groupId!}</td>
+						<td><input class="checkeddb" ${(gr.isValid == 2 )?string('disabled','')} name="subBox" type="checkbox" ${(gr.isValid == 1 )?string('checked','')} value="${gr.groupId}" /></td>
+						<td>${gr.NickName!}</td>
+						<td>${gr.uname!}</td>
+					</tr>
+				</#list>
+				<#if page.list?size == 0>
+					<tr>
+						<td colspan="5">为空</td>
+					</tr>
+				</#if>
+			</tbody>
+		</table>
+		
+<script type="text/javascript">
+
+function upresults(){
+	var channelId = $('#cId').val();
+	$.post("/robotAdmin/rob/user/setChannel",{groId:groId,channelId:channelId},function(msg){
+		layer.closeAll();
+		if(msg.code =="0"){
+			$('#exampleModal').modal('hide');
+			layer.alert(msg.info,9,function(){
+				window.location.reload();
+			});
+		}else{
+			layer.alert(msg.info,3);
+		}
+	},"json");
+	
+}
+$(function(){
+	$('#gather').click(function(){
+		var ids = '';
+		$(".chedb input[name='subBox']:checked").each(function(){
+			if ($(this).is(':checked')) {
+				ids += '&'+$(this).attr('value');
+			}
+		});
+		ids = ids.substring(1);
+		$.post("/robotAdmin/rob/gather",{ids:ids,uin:'${uin}'},function(msg){
+			layer.closeAll();
+			if(msg.code =="0"){
+				layer.alert(msg.info,9,function(){
+					window.location.reload();
+				});
+			}
+		},"json");
+		
+	});
+  });
+  
+$("#CheckAll").click(function(){   
+    if(this.checked){   
+        $("#lists input[name='subBox']").prop("checked", true);  
+        $("#lists input[disabled]").prop("checked", false);
+    }else{
+		$("#lists input[name='subBox']").prop("checked", false);
+    }   
+});
+</script>
+<#include "../../include/_paginate.html" />
+<@paginate currentPage=page.pageNumber totalPage=page.totalPage actionUrl="/robotAdmin/rob/user/groupList/"/>
+</fieldset>
+</@layout>

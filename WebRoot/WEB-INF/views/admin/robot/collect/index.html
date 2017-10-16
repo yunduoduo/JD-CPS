@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>login</title>
+<script type="text/javascript" src="/res/js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="/res/js/layer/layer.min.js"></script>
+<script type="text/javascript" src="/res/js/common.js"></script>
+<link href="/res/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<script type="text/javascript">
+$(function(){
+	$(".collect").click(function(){
+		$.post("/robotAdmin/rob/collect/wxUrl",{},function(msg){
+			if(msg.code=="0"){
+				$.post("/robotAdmin/rob/collect/login",{},function(msg){
+					var uin = msg.data;
+					if(msg.code=="0"){
+						$.ajax({
+        					type: "POST",
+       	 					data: "uin="+uin,
+        					dataType: "JSON", 
+					        async: false,
+					        url: "/robotAdmin/rob/gather/listenerMsg",
+					        success: function(data) {
+					       	}
+					    });
+						console.log(msg.names);
+						if(msg.names =='' ||  msg.names =='[]' ){
+							window.location.href="/robotAdmin/rob/user/wxUserList";
+						}else{
+							layer.alert("获取到您的群昵称有重复【"+msg.names+"】",9,function(){
+								window.location.href="/robotAdmin/rob/user/wxUserList";
+							});
+						}
+					}else{
+						$('.test').css("display","none");
+						layer.alert(msg.info,3);
+					}
+				},"json");
+				$('#wxUrl').attr("src",msg.info);
+				$('.test').css("display","block");
+			}
+		},"json");
+		 
+	});
+});
+</script>
+</head>
+<body>
+<div class="test" style="display: none;border: 1px; position: fixed;background: rgba(0,0,0,.2);left:30%;top:78px;  width: 240px; height:300px;">
+<img alt="" src="" id="wxUrl" width="200px;" style="position: absolute; left: 50%; margin-left: -100px; top: 50px">
+<p style="color: white;text-align: center;line-height: 50px;">使用手机微信扫码登录</p>
+</div>
+<div style="margin:  70px 0 0 70px ">
+<button type="button" class="btn btn-success collect" >登录微信</button>
+</div>
+</body>
+</html>

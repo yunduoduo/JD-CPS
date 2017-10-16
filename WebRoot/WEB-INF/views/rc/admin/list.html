@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<#include "include/_layout.html" />
+<@layout page_title="管理后台">
+<style type="text/css">
+.table thead tr th {background: #8FBFE7;text-align: center;}
+th,td {text-align: center;}
+</style>
+<div class="" style="margin-right: inherit; margin-left: inherit;">
+<fieldset>
+	<legend>全部用户</legend>
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+				<th>账号</th>
+				<th>状态</th>
+				<th>分组</th>
+				<th>创建日期</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<#list admins as admin>
+				<tr>
+					<td>${admin.account }</td>
+					<td>${admin.isValid ? string('有效', '无效') }</td>
+					<td>${admin.role.roleName }</td>
+					<td>
+						<fmt:formatDate value="${admin.createDate }" type="both"/>
+						${admin.createDate?string("yyyy-MM-dd HH:mm:ss")}
+					</td>
+					<td>
+						<button type="button" adminId="${admin.adminId }" class="btn btn-${admin.isValid ? string('success', 'danger') } toValid">${admin.isValid ? string('有效', '无效') }</button>
+						<button type="button" class="btn btn-primary initPwd" adminId="${admin.adminId }">初始化密码</button>
+						<a class="btn btn-primary" href="/rc/admin/edit/${admin.adminId }">编辑</a>
+					</td>
+				</tr>
+			</#list>
+		</tbody>
+	</table>
+</fieldset>
+</div>
+
+</@layout>
+
+<script type="text/javascript">
+$(function() {
+	$(document).on("click", ".toValid", function() {
+		var adminId = $(this).attr("adminId");
+		$.post("/rc/admin/valid", {adminId: adminId}, function(msg) {
+			location.href = location.href;
+		}, "json");
+	}).on("click", ".initPwd", function() {
+		var adminId = $(this).attr("adminId");
+		var newPwd = window.prompt("输入新密码");
+		if (newPwd) {
+			load = layer.load('正在修改');
+			$.post("/rc/admin/initPwd", {adminId: adminId, newPwd: newPwd}, function(msg) {
+				alert(msg.info);
+				layer.close(load);
+			});
+		}
+	});
+});
+</script>

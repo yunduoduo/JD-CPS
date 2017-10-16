@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<#include "../../include/_layout.html" />
+<@layout page_title="管理后台">
+<style type="text/css">
+.table {width: 1800px;}
+</style>
+	<fieldset>
+		<legend>转链后信息</legend>
+		<form class="form-inline" role="form" action="/robotAdmin/rob/gather/linksList" method="post" >
+			<div class="form-group">
+			    <label class="sr-only" for="typeId">类型</label>
+			    <select class="form-control" id="jdChannelId" name="jdChannelId">
+			    	<option value="">=请选择推广位=</option>
+			    	<#list channel as type>
+					<option value="${type.jdChannelId}" ${(((param.jdChannelId)!'0') == type.jdChannelId?string)?string('selected','')}>${type.spaceName}</option>
+					</#list>
+			    </select>
+		  	</div>
+		  	<div class="form-group">
+				<label class="sr-only" for="delivererStartDate">时间</label> 
+				<input type="text" class="form-control" style="cursor: default;" id="startRegDate" name="startRegDate" placeholder="开始日期" readonly="readonly" 
+					 value="${param.startRegDate!}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'endRegDate\')||\'2020-10-01\'}'});"> 
+				- 
+				<input type="text" class="form-control" style="cursor: default;" id="endRegDate" name="endRegDate" placeholder="结束日期" readonly="readonly"
+					value="${param.endRegDate!}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', minDate:'#F{$dp.$D(\'startRegDate\')}',maxDate:'2020-10-01'});">
+			</div>
+			<button type="submit" class="btn btn-success ">搜索</button>
+		</form>
+		<table class="table table-bordered table-hover table-condensed" id="lists" style="margin-top: 10px;">
+			<thead>
+				<tr>
+					<th style="width:50px;">主键</th>
+					<th style="width: 100px;">联盟ID</th>
+					<th style="width: 100px;">skuId</th>
+					<th style="width: 100px;">推广位</th>
+					<th style="width: 200px;">商品名称</th>
+					<th style="width: 100px;">图片</th>
+					<th style="width:300px;">内容</th>
+					<th style="width:100px;">状态</th>
+					<th style="width:100px;">时间</th>
+					<th style="width:100px;">转链状态</th>
+					<th style="width:50px;">操作</th>
+				</tr>
+			</thead>
+			<tbody class="chedb">
+				<#list page.list as gr>
+					<tr>
+						<td>${gr.linksMsgId}</td>
+						<td>${gr.unionId}</td>
+						<td>${gr.skuId}</td>
+						<td>${gr.spaceName!'默认推广位'}</td>
+						<td>${gr.goodsName!}</td>
+						<td><#if gr.GoodsPict??> <img alt="" width="100px;" src="${gr.GoodsPict!}"> </#if></td>
+						<td>${gr.contents!}</td>
+						<td><#if gr.statusType == 1 >待发送<#elseif gr.statusType == 2>发送成功<#elseif gr.statusType == -1>发送失败</#if></td>
+						<td>${gr.createDate}</td>
+						<td>${gr.isSelf?string('自动转链','手动转链')}</td>
+						<td><a href="/robotAdmin/rob/gather/editLinks/${gr.linksMsgId}">编辑</a></br>
+						<a href="/robotAdmin/rob/gather/linksMsg/${gr.linksMsgId}">详情</a></br>
+						<a href="javascript:;" class="deleteLinksMsg" linksId="${gr.linksMsgId}">删除</a>
+						</td>
+					</tr>
+				</#list>
+				<#if page.list?size == 0>
+					<tr>
+						<td colspan="10">为空</td>
+					</tr>
+				</#if>
+			</tbody>
+		</table>
+<script type="text/javascript">
+$(function(){
+	$('.deleteLinksMsg').click(function(){
+		if(confirm("您确定要删除吗？") == true){
+			var linksId = $(this).attr("linksId");
+			 $.ajax({
+	             type: "POST",
+	             url: "/robotAdmin/rob/gather/deleteLinksMsg",
+	             data: "linksId="+linksId,
+	             dataType: "json",
+	             success: function(msg){
+	            	 if(msg.code=="0"){
+	            		 alert("删除成功");
+	            		 window.location.reload();
+	            	 }else{
+	            		alert(msg.info);
+	            	 }
+	                 
+	              }
+	         });
+		}
+	});
+});
+
+</script>
+<#include "../../include/_paginate.html" />
+<@paginate currentPage=page.pageNumber totalPage=page.totalPage actionUrl="/robotAdmin/rob/gather/linksList/"/>
+</fieldset>
+</@layout>

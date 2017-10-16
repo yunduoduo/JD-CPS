@@ -1,0 +1,75 @@
+<#macro layout page_title backto='javascript:history.go(-1)'>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="format-detection" content="telephone=no" />
+<title>${page_title}</title>
+<link href="/res/weixin/css/global.css?t=20" rel="stylesheet">
+<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery-lazyload/1.9.5/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="/res/js/jquery.form.js"></script>
+<script type="text/javascript" src="/res/js/jquery.slides.js"></script>
+<script type="text/javascript" src="/res/js/browserDetect.js"></script>
+<script type="text/javascript" src="/res/js/layer.m/layer.m.js?t=4"></script>
+<script type="text/javascript" src="/res/js/calendar/WdatePicker.js"></script>
+<script type="text/javascript" src="/res/js/mustache.js"></script>
+<script type="text/javascript" src="/res/js/commonM.js?t=4"></script>
+<script type="text/javascript" src="/res/js/validator1.1M.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+   <style type="text/css">
+.en {font-family:Arial}
+    .bottombtn .total-weixin {
+    float: left;
+    width: 65%;
+    height: 46px;
+    line-height: 46px;
+    padding-left: 5%;
+    color: #FFF;
+    background: #555 none repeat scroll 0% 0%;
+}
+
+
+.type3-weixin {
+    background: #FF496B none repeat scroll 0% 0%;
+    color: #FFF;
+    height: 46px;
+    line-height: 46px;
+    border-radius: 0px;
+}
+
+              </style>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?0b01bf20af9a582def38f217e8da70c1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</head>
+<body>
+
+<#nested>
+
+<script type="text/javascript">
+	$(function() {
+		document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+			if (location.href.indexOf("/weixin/invite/share") != -1 
+			|| location.href.indexOf("/weixin/product") || location.href.indexOf("/weixin/aritcel") 
+			|| location.href.indexOf("/weixin/activity/pointLottery") != -1) {
+				WeixinJSBridge.call('showOptionMenu');
+				WeixinJSBridge.call('showToolbar');
+			} else {
+				WeixinJSBridge.call('hideOptionMenu');
+				WeixinJSBridge.call('hideToolbar');
+			}
+		});
+	});
+</script>
+</body>
+</html>
+</#macro>

@@ -1,0 +1,7 @@
+body {font:14px/18px 'Microsoft YaHei';}
+.txtcenter {text-align:center}
+.wrap {width:980px; margin:0 auto;}
+.header {height:54px; background:#2bb8aa}
+.header .logo {background:url(../images/logo.jpg) no-repeat; width:164px; height:54px; display:block}
+.con {height:220px; padding:150px 0; background:url(../images/conbg.jpg) center no-repeat}
+.footer {height:40px; text-align:center; color:#fff; background:#2bb8aa; line-height:40px; position:fixed; bottom:0; left:0; width:100%;}

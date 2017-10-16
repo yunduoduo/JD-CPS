@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<#include "../include/_layout.html" />
+<@layout page_title="编辑权限">
+<script type="text/javascript" src="/res/js/kindeditor/kindeditor-min.js"></script>
+<script type="text/javascript">
+
+
+function checkForm() {
+	trimBlank();
+	
+	if (rc_form_validator()) {
+		return true;
+	}
+	
+	return false;
+}
+</script>
+
+<!--
+<form id="uploadForm" action="/admin/upload/imageCompress" method="post" enctype="multipart/form-data">  
+-->
+<div class="container-fluid">
+<fieldset>
+	<legend>添加权限</legend>
+	
+	<form class="form-horizontal" role="form" action="/rc/admin/permission/save" method="post" onsubmit="return checkForm()">
+		<div class="form-group">
+			<label class="col-sm-2 control-label" for="batchName">权限名称&nbsp;<span class="text-danger">*</span></label>
+			<div class="col-sm-8">
+		    <input type="text" class="form-control" id="permissionName" name="p.permissionName" placeholder="权限名称" maxlength="100" required="required" value="${(p.permissionName)!}">
+		    </div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" for="batchName">权限地址&nbsp;<span class="text-danger">*</span></label>
+			<div class="col-sm-8">
+		    <input type="text" class="form-control" id="viewUrl" name="p.viewUrl" placeholder="权限地址" maxlength="100" required="required" value="${(p.viewUrl)!}">
+		    </div>
+		</div>
+	  	<div class="form-group">
+	    	<div class="col-sm-offset-2 col-sm-8">
+	      		<button type="submit" href="javascript:;" class="btn btn-default">提交</button>
+	    	</div>
+	  	</div>
+	</form>
+</fieldset>
+</div>
+</@layout>

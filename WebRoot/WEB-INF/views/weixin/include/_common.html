@@ -1,0 +1,161 @@
+<#macro userinfo userId className="myinfo">
+<#if userId != '0'>
+<@_my_info userId="${userId}">
+<div class="${className}">
+	<a href="/weixin/user/taskIntegration">
+        <span class="head${(className=='topbox')?string('pic', '')}"><img src="${user.headImgUrl!}" width="100%"  alt=""/></span>
+        <div class="text">
+            <h5>亲爱的${user.realName}</h5>
+           	 已有 <span class="org" id="__globalPoint">${user.point}</span> 积分，马上赚积分
+        </div>
+    </a>
+</div>
+</@_my_info>
+</#if>
+</#macro>
+
+<#macro getOrderStatusName orderStatusId>
+	<#if orderStatusId == '1'>
+	已下单
+	<#elseif orderStatusId == '2'>
+	已付款
+	<#elseif orderStatusId == '3'>
+	已发货
+	<#elseif orderStatusId == '4'>
+	已完成
+	<#elseif orderStatusId == '99'>
+	已取消
+	</#if>
+</#macro>
+
+<#macro selAddr userId>
+    <form id="newAddressForm" action="/weixin/buy/generalOrder" method="post" onsubmit="return checkAddress()">
+    <ul id="newAddressArea" style="display: none;">
+    	<li>
+        	<span class="col1">姓名：</span>
+        	<span class="col4"><input type="text" name="a.consignee" placeholder="收件人姓名" class="input1" maxlength="10" required="required" value="${(user.realName)!}"></span>
+        </li>
+        <li>
+        	<span class="col1">电话：</span>
+        	<span class="col4"><input type="tel" name="a.mobile" placeholder="收件人联系电话" class="input1" maxlength="11" required="required" pattern="^1[0-9]{10}$" value="${(user.mobile)!}"></span>
+        </li>
+        <li>
+        	<span class="col1">城市：</span>
+        	<span class="col4">
+                <select class="select2" id="province" name="a.provinceId" title="请选择省份">
+                    <option value="0">省份</option>
+                    <@_province_list>
+                        <#list provinces as province>
+                            <option value="${province.provinceId}">${province.provinceName}</option>
+                        </#list>
+                    </@_province_list>
+                </select>
+                <select class="select2" id="cityId" name="a.cityId" title="请选择城市">
+                    <option value="0">城市</option>
+                </select>
+                <select class="select2" id="districtId" name="a.districtId" title="请选择区县">
+                    <option value="0">区县</option>
+                </select>
+            </span>
+        </li>
+        <li>
+        	<span class="col1">地址：</span>
+        	<span class="col4"><input type="text" name="a.address" placeholder="街道地址" class="input1" required="required" maxlength="100"></span>
+        </li>
+        <li>
+        	<span class="col1">邮编：</span>
+        	<span class="col4"><input type="tel" name="a.zip" placeholder="邮编" class="input1" required="required" maxlength="6"></span>
+        </li>
+        <li>
+        	<button type="submit" class="button type1">保存新的地址</button>
+        </li>
+    </ul>
+    </form>
+    <ul class="addresslist">
+    	<@_my_address userId="${userId}">
+    		<#list addresses as address>
+	  			<li class="adv"><label class="radio"><input type="radio" name="addressId" value="${address.addressId}"/><span class="col5"><b>${address.consignee} ${address.mobile}</b><br> ${address.provinceName} ${address.cityName} ${address.districtName} ${address.address} ${address.zip}</span></label></li>
+    		</#list>
+    	</@_my_address>
+    	<!--  
+    	<li id="addnewAddress"><input type="radio" name="addressId" value="0"/>添加新地址</li>
+    	-->
+    	<li><label class="addradio" id="addnewAddress"><span class="radiohide"><input type="radio" name="addressId" value="0"/><span class="col6">添加新地址</span></span></label></li>
+    </ul>
+    <!--  
+    <span id="addnewAddress" class="button type7"><span class="radiohide"><input type="radio" name="addressId" value="0"/>添加新地址</span></span>
+    -->
+<script type="text/javascript">
+function checkAddress() {
+	if (rc_form_validator() && rc_validator_select()) {
+		rcM.loading("正在保存地址...");
+		$.post("/weixin/user/saveAddress", $("#newAddressForm").serialize(), function(msg) {
+			if (msg.code == "0") {
+				location.href = location.href;
+			} else {
+				layer.closeAll();
+				rcM.alert(msg.info);
+			}
+		}, "json");
+		return false;
+	}
+	return false;
+}
+$(function() {
+	
+	$(document).on("change", "#province", function() {
+		var pid = $(this).val();
+		resetCity(pid);
+	}).on("change", "#cityId", function() {
+		var cid = $(this).val();
+		resetDistrict(cid);
+	}).on("click", "input[name='addressId']", function() {
+		$("input[name='addressId']").parent().removeClass("hover");
+		if ($(this).is(":checked")) {
+			$(this).parent().addClass("hover");	
+		}
+		
+		var addressId = $(this).val();
+		if (addressId == 0) {
+			$("#newAddressArea").slideDown();
+		} else {
+			$("#newAddressArea").slideUp();
+			$("#addnewAddress").show();
+		}
+	}).on("click", "#addnewAddress", function() {
+		$("#newAddressArea").slideDown();
+		$("#addnewAddress").hide();
+		
+		$("input[name='addressId']").each(function() {
+			$(this).removeAttr("checked");
+		});
+	});
+});
+
+function resetCity(pid) {
+	var option = '<option value="0">城市</option>';
+	$.post("/province/loadCity", {pid: pid}, function(msg) {
+		$.each(msg, function(i, n) {
+			option += '<option value="' + n.id + '">' + n.name + '</option>';
+		});
+		$("#cityId").html(option);
+	}, "json");
+	
+	resetDistrict(0);
+}
+
+function resetDistrict(cid) {
+	var option = '<option value="0">区县</option>'; 
+	if (cid == 0) {
+		$("#districtId").html(option);
+	} else {
+		$.post("/province/loadDistrict", {cid: cid}, function(msg) {
+			$.each(msg, function(i, n) {
+				option += '<option value="' + n.id + '">' + n.name + '</option>';
+			});
+			$("#districtId").html(option);
+		}, "json");
+	}
+}
+</script>
+</#macro>

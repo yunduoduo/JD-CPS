@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<#include "../../include/_layout.html" />
+<@layout page_title="管理后台">
+<div class="container-fluid">
+<fieldset>
+	<legend>编辑</legend>
+	<form class="form-horizontal" role="form" action="/robotAdmin/rob/gather/saveMsg" method="post" onsubmit="return toSubmit()">
+		<input type="hidden" id="listenerMsgId" name="ca.listenerMsgId" value="${(ca.listenerMsgId)! }"/>
+	  	<div class="form-group">
+			<label class="col-sm-2 control-label" for="content">类型名称&nbsp;<span class="text-danger">*</span></label>
+			<div class="col-sm-8">
+		    	<textarea rows="8" cols="8" type="text" class="form-control" id="content" name="ca.content"  required="required">${ca.content!}</textarea>
+		    </div>
+		</div>
+		<div class="form-group">
+		    <label class="col-sm-2 control-label" for="imgUrl">图片(400*400)<span class="text-danger">*</span></label>
+		    <div class="col-sm-8" id="inputFile">
+		    	<input type="file" class="form-control" id="uploadInput" name="pic" placeholder="图片" accept="image/jpeg">
+		    	<input type="hidden" id="imgUrl" name="ca.imgUrl" value="${(ca.imgUrl)!}"/>
+		    	<div id="imgPreview">
+			    	<#if (ca.imgUrl)??>
+				    	<img src="${ca.imgUrl}" width="200" class="img-thumbnail"/>
+			    	</#if>
+		    	</div>
+		    </div>
+		</div>
+	  	<div class="form-group">
+	    	<div class="col-sm-offset-2 col-sm-8">
+	      		<button type="submit"  class="btn btn-default" >提交</button>
+	    	</div>
+	  	</div>
+	</form>
+</fieldset>
+<script type="text/javascript">
+function toSubmit(){
+	if($("#content").val() ==''){
+		alert("内容不能为空");
+		return false;
+	}
+	if($("#imgUrl").val() ==''){
+		alert("图片不能为空");
+		return false;
+	}
+}
+$(function() {
+	$(document).on("change", "#uploadInput", function() {
+		if ($(this).val() == "") return;
+		var form = $('<form id="uploadForm" action="/robotAdmin/upload?dir=editImg&maxWidth=600" method="post" enctype="multipart/form-data"></form>');
+		form.append($(this));
+		var $this = $(this);
+		layer.load("上传中...");
+		form.ajaxSubmit({
+			dataType: "json",
+			success: function(msg) {
+				if (msg.code == "0") {
+					$("#imgPreview").html('<img src="' + msg.info + '" width="200" class="img-thumbnail"/>');
+					$("#imgUrl").val(msg.info);
+				} else {
+					alert(msg.info);
+				}
+				layer.closeAll();
+				$("#inputFile").prepend($this);
+			}
+		});
+	});
+});
+</script>
+</div>
+</@layout>

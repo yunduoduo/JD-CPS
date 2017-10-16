@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<#include "../../include/_layout.html" />
+<@layout page_title="管理后台">
+<style type="text/css">
+.table {text-align: center;}
+th{ text-align: center;}
+</style>
+	<fieldset>
+		<legend>商品推送记录</legend>
+		<form class="form-inline" action="/robotAdmin/rob/record/sendRecord" role="form" method="post" style="line-height: 35px; padding-bottom: 5px;">
+			<div class="form-group">
+				<label class="sr-only" for="UserName"></label>
+				<input type="text" class="form-control" id="UserName" name="UserName" placeholder="操作用户名" value="${param.UserName!}">
+			</div>
+			<div class="form-group">
+				<label class="sr-only" for="delivererStartDate">时间</label> 
+				<input type="text" class="form-control" style="cursor: default;" id="startRegDate" name="startRegDate" placeholder="开始日期" readonly="readonly" 
+					 value="${param.startRegDate!}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'endRegDate\')||\'2020-10-01\'}'});"> 
+				- 
+				<input type="text" class="form-control" style="cursor: default;" id="endRegDate" name="endRegDate" placeholder="结束日期" readonly="readonly"
+					value="${param.endRegDate!}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', minDate:'#F{$dp.$D(\'startRegDate\')}',maxDate:'2020-10-01'});">
+			</div>
+			<button type="submit" class="btn btn-default">搜</button>
+<!-- 			<button type="button" class="btn btn-default " id="downloadBtn1">下载</button>
+ -->		</form>
+		
+		<table class="table table-bordered table-hover table-condensed" id="lists">
+			<thead>
+				<tr>
+					<th style="width:50px;">主键</th>
+					<th style="width: 120px;">商品名称</th>
+					<th style="width: 100px;">SkuId</th>
+					<th  style="width:100px;">推广位</th>
+					<th style="width:90px;">推送微信群数量</th>
+					<th style="width:90px;">推送成功数量</th>
+					<th style="width:80px;">推送时间</th>
+					<th style="width:60px;">操作用户</th>
+				</tr>
+			</thead>
+			<tbody class="chedb">
+				<#list page.list as gr>
+					<tr>
+						<td>${gr.id!}</td>
+						<td>${gr.goodsName!}</td>
+						<td>${gr.skuId!}</td>
+						<td>${gr.spaceName!}</td>
+						<td>${gr.SendWXCount!}</td>
+						<td>${gr.SuccessCount!}</td>
+						<td>${gr.SendTime!}</td>
+						<td>${gr.UserName!}</td>
+					</tr>
+				</#list>
+				<#if page.list?size == 0>
+					<tr>
+						<td colspan="10">为空</td>
+					</tr>
+				</#if>
+			</tbody>
+		</table>
+<#include "../../include/_paginate.html" />
+<@paginate currentPage=page.pageNumber totalPage=page.totalPage actionUrl="/robotAdmin/rob/record/sendRecord/"/>
+</fieldset>
+</@layout>

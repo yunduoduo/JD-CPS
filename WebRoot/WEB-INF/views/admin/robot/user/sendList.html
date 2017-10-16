@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<#include "../../include/_layout.html" />
+
+<@layout page_title="管理后台">
+	<fieldset>
+		<legend>用户群信息</legend>
+		<div style="margin-bottom: 7px;">
+			<button type="button" class="btn btn-primary " id="generalize">设置群发群</button>
+		</div>
+		<table class="table table-bordered table-hover table-condensed" id="lists">
+			<thead>
+				<tr>
+					<th style="text-align: center;">主键</th>
+					<th style="width: 120px;text-align: center;"><input id="CheckAll_2" type="checkbox" />&nbsp;设置群发群</th>
+					<th style="text-align: center;">群名称</th>
+					<th style="text-align: center;">群来自于</th>
+					<th style="text-align: center;">推广位</th>
+					<th style="text-align: center;">设置推广位</th>
+				</tr>
+			</thead>
+			<tbody style="text-align: center;" class="chedb">
+				<#list page.list as gr>
+					<tr>
+						<td>${gr.groupId!}</td>
+						<td><input  class="checkeddb" name="subBox_2" type="checkbox" ${(gr.isValid == 2 )?string('checked','')} ${(gr.isValid == 1 )?string('disabled','')} value="${gr.groupId}" /></td>
+						<td>${gr.gname!}</td>
+						<td>${gr.uname!}</td>
+						<td>${gr.spaceName!'默认推广位'}</td>
+						<td><a href="javascript:;" onclick="matching(${gr.groupId!})">设置推广位</a></td>
+					</tr>
+				</#list>
+				<#if page.list?size == 0>
+					<tr>
+						<td colspan="5">为空</td>
+					</tr>
+				</#if>
+			</tbody>
+		</table>
+		
+	<div class="modal fade" id="exampleModal" style="display: none;" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="exampleModalLabel">选择操作类型</h4>
+	      </div>
+	      <div class="modal-body">
+	        	<div class="form-group">
+		      		<input id="groId" type="tel" hidden="true" value="">
+				    <select class="form-control input-sm" id="cId" >
+						<option value="0">===推广位===</option>
+						<#list channel as type>
+							<option value="${type.channelId}" ${(((param.channelId)!'0') == type.channelId?string)?string('selected','')}>${type.spaceName}</option>
+						</#list>
+					</select>
+	  			</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+	        <button type="button" class="btn btn-primary" onclick="upresults()" id="addLoc">提交</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<script type="text/javascript">
+
+function matching(groupId){
+	$('#exampleModal').modal('show');
+	$('#groId').val(groupId);
+}
+function upresults(){
+	var channelId = $('#cId').val();
+	var groId = $('#groId').val();
+	if(groId ==''){
+		layer.alert("没有获取到群主键",3);
+		return false;
+	}
+	$.post("/robotAdmin/rob/user/setChannel",{groId:groId,channelId:channelId},function(msg){
+		layer.closeAll();
+		if(msg.code =="0"){
+			$('#exampleModal').modal('hide');
+			layer.alert(msg.info,9,function(){
+				window.location.reload();
+			});
+		}else{
+			layer.alert(msg.info,3);
+		}
+	},"json");
+	
+}
+$(function(){
+	$('#generalize').click(function(){
+		var ids_t = "";
+		$(".chedb input[name='subBox_2']:checked").each(function(){
+			if ($(this).is(':checked')) {
+				ids_t += '&'+$(this).attr('value');
+			}
+		});
+		ids_t = ids_t.substring(1);
+		$.post("/robotAdmin/rob/user/sendMsg",{ids:ids_t,uin:'${uin}'},function(msg){
+			layer.closeAll();
+			if(msg.code =="0"){
+				layer.alert(msg.info,9,function(){
+					window.location.reload();
+				});
+			}else{
+				layer.alert(msg.info,3);
+			}
+		},"json");
+	});
+  });
+  
+  
+$("#CheckAll_2").click(function(){   
+    if(this.checked){   
+        $("#lists input[name='subBox_2']").prop("checked", true);
+        $("#lists input[disabled]").prop("checked", false); 
+    }else{
+		$("#lists input[name='subBox_2']").prop("checked", false);
+    }   
+});
+</script>
+<#include "../../include/_paginate.html" />
+<@paginate currentPage=page.pageNumber totalPage=page.totalPage actionUrl="/robotAdmin/rob/user/groupList/"/>
+</fieldset>
+</@layout>

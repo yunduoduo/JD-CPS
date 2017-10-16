@@ -1,0 +1,173 @@
+package com.raincc.robot.util;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.sf.json.JSONObject;
+
+import com.raincc.robot.config.TConstants;
+
+public class HttpRequestUtilsBak {
+	
+	private static Logger _log = LoggerFactory.getLogger(HttpClientUtils.class); 
+	 public static void main(String[] args) {
+	        //发送 GET 请求
+//	        String s = sendGet("http://localhost:6144/Home/RequestString", "key=123&v=456");
+//	        System.out.println(s);
+	        
+			
+			JSONObject data = new JSONObject();
+			JSONObject j1 = new JSONObject();
+			j1.put("total",0);
+			j1.put("pageNum",1);
+			j1.put("size",10);
+			data.put("pagination", j1.toString());
+			data.put("order","[]");
+			data.put("data", "[]");
+			List list = new ArrayList();
+			JSONObject j3 = new JSONObject();
+			j3.put("name","accountDateStr");
+			j3.put("value","2017-08-03#2017-08-10");
+			list.add(j3);
+			JSONObject j4 = new JSONObject();
+			j4.put("name","shortcutDate");
+			j4.put("value","");
+			list.add(j4);
+			JSONObject j5 = new JSONObject();
+			j5.put("name","orderStatus");
+			j5.put("value","");
+			list.add(j5);
+			data.put("search", list.toString());
+	        //发送 POST 请求
+			System.err.println(data.toString());
+	        String sr = sendPost(TConstants.JD_PY_ImportOrders, data.toString());
+	        System.out.println(sr);
+	    }
+    /**
+     * 向指定URL发送GET方法的请求
+     * @param url
+     *            发送请求的URL
+     * @param param
+     *            请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
+     * @return URL 所代表远程资源的响应结果
+     */
+    public static String sendGet(String url, String param) {
+        String result = "";
+        BufferedReader in = null;
+        try {
+            String urlNameString = url + "?" + param;
+            URL realUrl = new URL(urlNameString);
+            // 打开和URL之间的连接
+            URLConnection connection = realUrl.openConnection();
+            // 设置通用的请求属性
+            connection.setRequestProperty("accept", "*/*");
+            connection.setRequestProperty("connection", "Keep-Alive");
+            connection.setRequestProperty("user-agent","Mozilla/5.0 (iPad; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5");
+            
+
+            // 建立实际的连接
+            connection.connect();
+            // 获取所有响应头字段
+            Map<String, List<String>> map = connection.getHeaderFields();
+            // 遍历所有的响应头字段
+            for (String key : map.keySet()) {
+                System.out.println(key + "--->" + map.get(key));
+            }
+            // 定义 BufferedReader输入流来读取URL的响应
+            in = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream(),"utf-8"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+        } catch (Exception e) {
+            System.out.println("发送GET请求出现异常！" + e);
+            e.printStackTrace();
+        }
+        // 使用finally块来关闭输入流
+        finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 向指定 URL 发送POST方法的请求
+     * 
+     * @param url
+     *            发送请求的 URL
+     * @param param
+     *            请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
+     * @return 所代表远程资源的响应结果
+     */
+    public static String sendPost(String url, String param) {
+    	
+        PrintWriter out = null;
+        BufferedReader in = null;
+        String result = "";
+        String cookie = "ceshi3.com=000; _pst=bailingclub; logining=1; _tp=NjawBw4ZvMB55W436wGWZQ%3D%3D; ol=1; thor=F48E127F73D7724CD5082DF1ED5C58BFDCCBC344183032CE93734135EC89E6BE332FBA5762B465E2EE25AFD49D8FF3E5C56DD58595DEC96A6AD17AD3EB37E7C23EF4E66B264A969665E38F4EB5D09A2491E72CE6F0C39EA1C4218AD0698EEAD677FDE9D92FD1D88FA198199384557AD9CCAF5A07E86C93FB5373B19F06A77010ED4DD5F20AC2993167908C697A0166D1; unick=bailingclub; pin=bailingclub; pinId=D48GhzVhaXqopRlADUeaYg; TrackID=15UypmZLruuitQ8tof5pry1AKt4eruhzKr7jeVYIIWc_HZ2bDOTa7b0rqskPwqk89cD0B_NMtKAu9Q2IsVkiAsg; mp=bailingclub; _ntFpKge=''; login_c=1";
+        try {
+            URL realUrl = new URL(url);
+            // 打开和URL之间的连接
+            URLConnection conn = realUrl.openConnection();
+            // 设置通用的请求属性
+            conn.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
+            conn.setRequestProperty("connection", "Keep-Alive");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setRequestProperty("user-agent",
+                    "Mozilla/5.0 (iPad; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5");
+            conn.setRequestProperty("Cookie", cookie);
+            conn.setRequestProperty("Accept-Charset", "utf-8");
+            // 发送POST请求必须设置如下两行
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            // 获取URLConnection对象对应的输出流
+            out = new PrintWriter(conn.getOutputStream());
+            
+            // 发送请求参数
+            out.print(param);
+            // flush输出流的缓冲
+            out.flush();
+            // 定义BufferedReader输入流来读取URL的响应
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+        } catch (Exception e) {
+            System.out.println("发送 POST 请求出现异常！"+e);
+            e.printStackTrace();
+        }
+        //使用finally块来关闭输出流、输入流
+        finally{
+            try{
+                if(out!=null){
+                    out.close();
+                }
+                if(in!=null){
+                    in.close();
+                }
+            }
+            catch(IOException ex){
+                ex.printStackTrace();
+            }
+        }
+        return result;
+    }    
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<#include "../include/_layout.html" />
+<@layout page_title="管理后台">
+<style type="text/css">
+.table thead tr th {background: #8FBFE7;text-align: center;}
+th,td {text-align: center;}
+</style>
+<div class="" style="margin-right: inherit; margin-left: inherit;">
+<fieldset>
+	<legend>管理员角色列表</legend>
+	<div style="padding-bottom: 10px;"><a href="/rc/admin/role/add" class="btn btn-primary">添加角色</a></div>
+	<table class="table table-bordered table-hover">
+		<thead>
+			<tr>
+				<th style="width: 60px;">ID</th>
+				<th style="width: 100px;">角色名称</th>
+				<th >可用权限</th>
+				<th style="width: 80px;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<#list page.list as item>
+				<tr>
+					<td>${item.roleId}</td>
+					<td>${item.roleName }</td>
+					<td>
+						<#if item.isRoot == true>
+							全部
+						<#else>
+							<#list item.permissions as p>
+								${(p_index > 0) ? string(',', '')} 
+								${p.permissionName}
+							</#list>
+						</#if>
+					</td>
+					<td>
+						<#if item.isRoot == false>
+							<a href="/rc/admin/role/edit/${item.roleId }" class="btn btn-primary">修改</a>
+							<button type="button" roleId="${item.roleId }" class="btn btn-primary editPermission">权限</button>
+						</#if>
+					</td>
+				</tr>
+			</#list>
+		</tbody>
+	</table>
+	<div>共${page.totalRow }条记录</div>
+	<raincc:page pages="${page.totalPage }" url="/rc/admin/group/list" page="${page.pageNumber }" prefix="/" type="admin"/>  
+</fieldset>
+</div>
+
+</@layout>
+
+<script type="text/javascript">
+$(function() {
+	$(document).on("click", ".editPermission", function() {
+		var roleId = $(this).attr("roleId");
+		var pagei = $.layer({
+		    type: 1,   //0-4的选择,
+		    title: false,
+		    border: [0],
+		    closeBtn: [0],
+		    shadeClose: true,
+		    area: ['100%', '100%'],
+		    page: {
+		        url: '/rc/admin/permission/loadPermission?roleId=' + roleId
+		    }
+		});
+	});
+});
+</script>

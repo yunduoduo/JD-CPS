@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+ updateCheck="false"
+ maxBytesLocalHeap="100M"
+ maxBytesLocalDisk="5G">
+          
+    <diskStore path="java.io.tmpdir"/>   
+     <!--  -->
+    <defaultCache
+           maxElementsInMemory="10000"
+           maxElementsOnDisk="1000"
+           eternal="false"
+           copyOnRead="true"
+           overflowToDisk="true"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="1800"
+           memoryStoreEvictionPolicy="LFU"
+    />
+    <!-- 自定义cache -->
+	<!-- 一个小时过期的缓存 -->
+ 	<cache name="LRUCache-1h" 
+  		   timeToLiveSeconds="3600"/>
+  	<!-- 两个小时过期的缓存 -->
+ 	<cache name="LRUCache-2h" 
+  		   timeToLiveSeconds="7200"/>
+ 	<!-- 一天过期的缓存 -->
+ 	<cache name="LRUCache-1d" 
+ 		   timeToLiveSeconds="86400"/>
+ 	<!-- 十天过期的缓存 -->
+ 	<cache name="LRUCache-10d" 
+ 		   timeToLiveSeconds="864000"/>
+    <!-- 5分钟过期的缓存 -->
+ 	<cache name="LRUCache-5m" 
+ 		   timeToLiveSeconds="300"/>
+</ehcache>

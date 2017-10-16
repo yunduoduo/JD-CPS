@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<#include "../../include/_layout.html" />
+<@layout page_title="管理后台">
+<style type="text/css">
+.table {text-align: center;}
+th{ text-align: center;}
+</style>
+	<fieldset>
+		<legend>操作日志</legend>
+		<form class="form-inline" action="/robotAdmin/rob/adminLog/findLogs" role="form" method="post" style="line-height: 35px; padding-bottom: 5px;">
+			<div class="form-group">
+				<label class="sr-only" for="userName"></label>
+				<input type="text" class="form-control" id="userName" name="userName" placeholder="操作用户名" value="${param.userName!}">
+			</div>
+			<div class="form-group">
+			    <label class="sr-only" for="typeId">类型</label>
+			    <select class="form-control" id="logTypeId" name="logTypeId">
+			    	<option value="">=日志类型=</option>
+			    	<#list logType as type>
+					<option value="${type.logTypeId}" ${(((param.logTypeId)!'0') == type.logTypeId?string)?string('selected','')}>${type.typeName}</option>
+					</#list>
+			    </select>
+		  	</div>
+			<div class="form-group">
+				<label class="sr-only" for="delivererStartDate">时间</label> 
+				<input type="text" class="form-control" style="cursor: default;" id="startRegDate" name="startRegDate" placeholder="开始日期" readonly="readonly" 
+					 value="${param.startRegDate!}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', maxDate:'#F{$dp.$D(\'endRegDate\')||\'2020-10-01\'}'});"> 
+				- 
+				<input type="text" class="form-control" style="cursor: default;" id="endRegDate" name="endRegDate" placeholder="结束日期" readonly="readonly"
+					value="${param.endRegDate!}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss', minDate:'#F{$dp.$D(\'startRegDate\')}',maxDate:'2020-10-01'});">
+			</div>
+			<button type="submit" class="btn btn-default">搜</button>
+		</form>
+		
+		<table class="table table-bordered table-hover table-condensed" id="lists">
+			<thead>
+				<tr>
+					<th style="width:100px;">主键</th>
+					<th  style="width:100px;">IP地址</th>
+					<th style="width:140px;">日志类型</th>
+					<th >日志描述</th>
+					<th style="width:120px;">时间</th>
+					<th style="width: 120px;">操作用户</th>
+				</tr>
+			</thead>
+			<tbody class="chedb">
+				<#list page.list as gr>
+					<tr>
+						<td>${gr.logId!}</td>
+						<td>${gr.IPAddress!}</td>
+						<td>${gr.typeName!}</td>
+						<td>${gr.logInfo!}</td>
+						<td>${gr.createDate!}</td>
+						<td>${gr.userName!}</td>
+					</tr>
+				</#list>
+				<#if page.list?size == 0>
+					<tr>
+						<td colspan="10">为空</td>
+					</tr>
+				</#if>
+			</tbody>
+		</table>
+<#include "../../include/_paginate.html" />
+<@paginate currentPage=page.pageNumber totalPage=page.totalPage actionUrl="/robotAdmin/rob/adminLog/findLogs/"/>
+</fieldset>
+</@layout>

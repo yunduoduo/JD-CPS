@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<#include "../../../include/_layout.html" />
+<@layout page_title="管理后台">
+<style type="text/css">
+.test thead tr th {background: #f6f7fb;text-align: center;}
+th,td {text-align: center;}
+.table {width: 1700px; max-width: auto; margin-bottom: 20px;}
+.test {width: 1700px;max-width: auto;margin-bottom: 20px;}
+fieldset {width: auto;}
+legend {width: 1700px;}
+</style>
+<script type="text/javascript">
+$(function(){
+	var union = "${jdUser.unionId!'0'}";
+	var JXJunionId = "${jdUser.JXJunionId!'0'}";
+	var param = "${param.unionsIds!'0'}";
+	var count = 0;
+	var sels = "";
+	if(param == union){
+		count = 1;
+	}else if(param == JXJunionId){
+		count = 2;
+	}
+	if(union != '' && union != '0'){
+		if(count == 1 || count == 0){
+			sels = "selected";
+		}
+		$('#unionsIds').append("<option value="+union+" "+sels+">京东联盟</option>");
+	}
+	if(JXJunionId != '' && JXJunionId != '0'){
+		if(sels == "selected"){
+			sels = "";
+		}
+		if(count == 2){
+			sels = "selected";
+		}
+		$('#unionsIds').append("<option value="+JXJunionId+" "+sels+">京享街</option>");
+	}
+}); 
+
+ 
+</script>
+<fieldset>
+	<legend>引入订单</legend>
+	<form class="form-inline" action="/robotAdmin/rob/jd/order/findImpOrder" role="form" method="get" style="line-height: 35px; padding-bottom: 5px;width: 1700px;">
+		<div class="form-group">
+		    <label class="sr-only" for="mobile"></label>
+		    <select class="form-control" id="unionsIds" name="unionsIds">
+		    	<!-- <option value="0" ${(param.unionsIds! == '0') ? string('selected', '')}>今天</option> -->
+		    </select>
+	  	</div>
+	
+		<div class="form-group">
+		    <label class="sr-only" for="realName"></label>
+		    <input type="number" class="form-control" id="orderId" name="orderId" placeholder="订单号" value="${param.orderId!}">
+	  	</div>
+	  	<div class="form-group">
+		    <label class="sr-only" for="delivererStartDate">下单时间</label>
+		    <input type="text" class="form-control" style="cursor: default;" id="startRegDate" name="startRegDate" placeholder="开始日期" readonly="readonly" value="${param.startRegDate!startRegDate}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:'#F{$dp.$D(\'endRegDate\')||\'2020-10-01\'}'});">
+		    -
+		    <input type="text" class="form-control" style="cursor: default;" id="endRegDate" name="endRegDate" placeholder="结束日期" readonly="readonly" value="${param.endRegDate!endRegDate}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:'#F{$dp.$D(\'startRegDate\')}',maxDate:'2020-10-01'});">
+	  	</div>
+	  	
+  		<div class="form-group">
+		    <label class="sr-only" for="mobile">快捷日期</label>
+		    <select class="form-control" id="shortDays" name="shortDays">
+		    	<option value="">=快捷日期=</option>
+		    	<option value="0" ${(param.shortDays! == '0') ? string('selected', '')}>今天</option>
+		    	<option value="-1" ${(param.shortDays! == '-1') ? string('selected', '')}>昨天</option>
+		    	<option value="-7" ${(param.shortDays! == '-7') ? string('selected', '')}>过去7天</option>
+		    	<option value="-15" ${(param.shortDays! == '-15') ? string('selected', '')}>过去15天</option>
+		    	<option value="-30" ${(param.shortDays! == '-30') ? string('selected', '')}>过去30天</option>
+		    	<option value="-60" ${(param.shortDays! == '-60') ? string('selected', '')}>过去60天</option>
+		    	<option value="-90" ${(param.shortDays! == '-90') ? string('selected', '')}>过去90天</option>
+		    	<option value="-120" ${(param.shortDays! == '-120') ? string('selected', '')}>过去120天</option>
+		    </select>
+	  	</div>
+	  	<div class="form-group">
+		    <label class="sr-only" for="mobile">有效无效</label>
+		    <select class="form-control" id="yn" name="yn">
+		    	<option value="">=是否有效=</option>
+		    	<option value="1" ${(param.yn! == '1') ? string('selected', '')}>有效</option>
+		    </select>
+	  	</div>
+	  	<button type="submit" class="btn btn-default btn-sm">&nbsp;搜&nbsp; </button>
+	    <button type="button" class="btn btn-default btn-sm" id="downloadBtn1" name="downloadBtn">下载</button>
+	    <button type="button" class="btn btn-default btn-sm" id="refreshOrder" name="">刷新订单</button>
+	</form>
+	<table class="table table-bordered table-hover table-condensed">
+		<thead>
+			<tr>
+				<th style="width: 115px;">订单号</th>
+				<th style="width: 285px;">商品名称</th>
+				<th style="width: 100px;">商品金额</th>
+				<th style="width: 80px;">商品数量</th>
+				<th style="width: 80px;">佣金比例</th>
+				<th style="width: 80px;">分成比例</th>
+				<th style="width: 80px;">预估收入</th>
+				<th style="width: 120px;">下单时间</th>
+				<th style="width: 120px;">完成时间</th>
+				<th style="width: 80px;">订单状态</th>
+				<th style="width: 80px;">是否拆单</th>
+				<th style="width: 80px;">是否有效</th>
+				<th style="width: 100px;">推广位名称</th>
+				<th style="width: 80px;">下单平台</th>
+				<th style="width: 80px;">会员PLUS</th>
+				<th style="width: 100px;">父单ID</th>
+			</tr>
+		</thead>
+		<tbody>
+		<#list page.list as order>
+			<table class="test table-bordered table-hover table-condensed">
+				<thead >
+					<tr>
+						<th style="width: 115px;">${order.orderId}</th>
+						<th style="width: 280px;">---</th>
+						<th style="width: 100px;">总额：${order.cosPrice!}</th>
+						<th style="width: 80px;">总量：${order.skuNums!}</th>
+						<th style="width: 80px;">---</th>
+						<th style="width: 85px;">---</th>
+						<th style="width: 80px;">总额：${order.commission!0}</th>
+						<th style="width: 120px;">${order.orderTime!}</th>
+						<th style="width: 120px;">${order.finishTime!}</th>
+						<th style="width: 80px;">${order.orderStatusName!}</th>
+						<th style="width: 80px;">${order.splitName!}</th>
+						<th style="width: 80px;">${(order.yn==1)?string('有效','无效')}</th>
+						<th style="width: 100px;">${order.spName!}</th>
+						<th style="width: 80px;">---</th>
+						<th style="width: 80px;">${(order.plus==1)?string('是','否')}</th>
+						<th style="width: 100px;">${order.parentId!0}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<#list order.skusList as sku>
+							<tr>
+								<td style="border: none;"></td>
+								<td>${sku.skuName!}</td>
+								<td>￥${sku.skuPrice!0}</td>
+								<td>${sku.skuNum!0}</td>
+								<td>${sku.commissionRate!}%</td>
+								<td>${sku.subSideRate!}%</td>
+								<td>￥${sku.commission!}</td>
+								<td style="border: none;" colspan="9"></td>
+							</tr>
+							
+					</#list>
+					<#if order.skusList?size == 0>
+						<tr>
+							<td colspan="18">为空</td>
+						</tr>
+					</#if>
+				</tbody>
+			</table>
+		</#list>
+			<#if page.list?size == 0>
+				<tr>
+					<td colspan="18">为空</td>
+				</tr>
+			</#if>
+		</tbody>
+	</table>
+<script type="text/javascript">
+$(function(){
+	$('#downloadBtn1').click(function(){
+		var orderId = $('#orderId').val();
+		var startRegDate = $('#startRegDate').val();
+		var endRegDate = $('#endRegDate').val();
+		var shortDays = $('#shortDays').val();
+		var yn = $('#yn').val();
+		var unionsIds = $('#unionsIds').val();
+		var params = "unionsIds="+unionsIds+"&orderId="+orderId+"&startRegDate="+startRegDate+"&endRegDate="+endRegDate+"&shortDays="+shortDays+"&yn="+yn+"&download="+1;
+		window.location.href="/robotAdmin/rob/jd/order/findImpOrder?"+params;
+	});
+	
+	$('#refreshOrder').click(function(){
+		var orderId = $('#orderId').val();
+		var startRegDate = $('#startRegDate').val();
+		var endRegDate = $('#endRegDate').val();
+		var shortDays = $('#shortDays').val();
+		var unionsIds = $('#unionsIds').val();
+		if(orderId =='' && startRegDate =='' && endRegDate =='' && shortDays =='' ){
+			layer.alert("请选择要刷新的内容。。。",3);
+			return false;
+		}
+		rc.loading("正在刷新订单...");
+		var data = {
+				"unionsIds":unionsIds,
+				"orderId":orderId,
+				"startRegDate":startRegDate,
+				"endRegDate":endRegDate,
+				"shortDays":shortDays
+		};
+		$.ajax({
+             type: "POST",
+             dataType: "json",
+             url: "/robotAdmin/rob/jd/order/refreshOrder",
+             data:data,
+             success: function (msg) {
+           	 layer.closeAll();
+                if(msg.code=="0"){
+                	layer.alert(msg.info,9,function(){
+	               		window.location.reload();
+                	});
+                }else{
+                	layer.alert(msg.info,3);
+                }
+             },
+             error: function(data) {
+            	 layer.alert(msg.info,3);
+              }
+         });
+	});
+	
+});
+</script>
+<#include "../../../include/_paginate.html" />
+<@paginate currentPage=page.pageNumber totalPage=page.totalPage actionUrl="/robotAdmin/rob/jd/order/findImpOrder/"/>
+</fieldset>
+</@layout>
